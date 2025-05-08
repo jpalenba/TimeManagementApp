@@ -1,0 +1,17 @@
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.AssemblyInfoInputs.cache
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.AssemblyInfo.cs
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.csproj.CoreCompileInputs.cache
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\bin\Debug\net9.0-windows\TimeManagementApp.exe
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\bin\Debug\net9.0-windows\TimeManagementApp.deps.json
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\bin\Debug\net9.0-windows\TimeManagementApp.runtimeconfig.json
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\bin\Debug\net9.0-windows\TimeManagementApp.dll
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\bin\Debug\net9.0-windows\TimeManagementApp.pdb
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.dll
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\refint\TimeManagementApp.dll
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.pdb
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.genruntimeconfig.cache
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\ref\TimeManagementApp.dll
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeManagementApp.csproj.AssemblyReference.cache
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\bin\Debug\net9.0-windows\Newtonsoft.Json.dll
+C:\Users\palen\OneDrive\Documents\ITCS Project\TimeManagementApp\obj\Debug\net9.0-windows\TimeMana.8314EA0F.Up2Date

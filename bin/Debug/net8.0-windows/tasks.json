@@ -1,0 +1,30 @@
+[
+  {
+    "Title": "Work",
+    "Day": "Monday",
+    "Time": "12:00:00",
+    "IsImportant": false,
+    "IsUrgent": false
+  },
+  {
+    "Title": "Sleep",
+    "Day": "Wednesday",
+    "Time": "12:00:00",
+    "IsImportant": false,
+    "IsUrgent": false
+  },
+  {
+    "Title": "Work",
+    "Day": "Friday",
+    "Time": "19:00:00",
+    "IsImportant": false,
+    "IsUrgent": false
+  },
+  {
+    "Title": "Sleep",
+    "Day": "Saturday",
+    "Time": "11:00:00",
+    "IsImportant": false,
+    "IsUrgent": false
+  }
+]
