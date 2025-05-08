@@ -264,15 +264,15 @@ namespace TimeManagementApp
         {
             int navHeight = (WindowState == FormWindowState.Maximized) ? 260 : 140;
 
-    int y = TopMargin;
-    foreach (Control c in buttonPanel.Controls)
-    {
-        c.Left   = (SidebarWidth - ButtonWidth) / 2;
-        c.Width  = ButtonWidth;
-        c.Height = navHeight;       // use computed height
-        c.Top    = y;
-        y       += c.Height + ButtonSpacing;
-    }
+            int y = TopMargin;
+            foreach (Control c in buttonPanel.Controls)
+            {
+                c.Left   = (SidebarWidth - ButtonWidth) / 2;
+                c.Width  = ButtonWidth;
+                c.Height = navHeight;       // use computed height
+                c.Top    = y;
+                y       += c.Height + ButtonSpacing;
+            }
         }
 
         [DllImport("user32.dll")] private static extern bool ReleaseCapture();
