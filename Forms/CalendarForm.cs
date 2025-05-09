@@ -12,10 +12,6 @@ using TimeManagementApp.Services;
 
 namespace TimeManagementApp.Forms
 {
-    /// <summary>
-    /// Represents the weekly calendar view with save/export/task persistence.
-    /// Inherits shared styling (font/colors) from BaseForm.
-    /// </summary>
     public partial class CalendarForm : BaseForm
     {
         private static readonly string[] Days =
@@ -65,7 +61,6 @@ namespace TimeManagementApp.Forms
             else
             {
                 InitializeScheduleGrid();
-                // clear tasks so no stale entries
                 TaskRepository.Tasks.Clear();
                 TaskRepository.Save();
             }
@@ -91,7 +86,7 @@ namespace TimeManagementApp.Forms
             btnSave.Text   = "💾 Save (Ctrl+S)";
             btnSave.Dock   = DockStyle.Right;
             btnSave.Width  = 140;
-            btnSave.Click += (_,_) => { SaveSchedule(); SaveTasks(); };
+            btnSave.Click += (_,_) => SaveSchedule();
             btnSave.BackColor = ControlPaint.Light(BackColor);
             btnSave.ForeColor = ForeColor;
             buttonPanel.Controls.Add(btnSave);
@@ -170,6 +165,7 @@ namespace TimeManagementApp.Forms
 
         private void SaveSchedule()
         {
+            // save grid to schedule.json
             var rows = scheduleGrid.Rows
                 .Cast<DataGridViewRow>()
                 .Where(r => !r.IsNewRow)
@@ -178,18 +174,43 @@ namespace TimeManagementApp.Forms
                     .Select(c => c.Value?.ToString() ?? "")
                     .ToArray())
                 .ToList();
-
             File.WriteAllText("schedule.json",
                 JsonConvert.SerializeObject(rows, Formatting.Indented));
 
-            // overwrite tasks.json on every save
+            // overwrite tasks.json from grid contents
+            TaskRepository.Tasks.Clear();
+            for (int r = 0; r < scheduleGrid.Rows.Count; r++)
+            {
+                for (int c = 1; c < scheduleGrid.Columns.Count; c++)
+                {
+                    var cell = scheduleGrid.Rows[r].Cells[c].Value?.ToString();
+                    if (string.IsNullOrWhiteSpace(cell)) continue;
+                    var parts = cell.Split(new[] { ": " }, 2, StringSplitOptions.None);
+                    var cat   = parts[0];
+                    var title = parts.Length > 1 ? parts[1] : "";
+                    if (!Categories.Contains(cat)) cat = "Personal";
+                    if (DateTime.TryParseExact(
+                        scheduleGrid.Rows[r].Cells[0].Value?.ToString(),
+                        "h:mm tt", CultureInfo.InvariantCulture,
+                        DateTimeStyles.None, out var dt))
+                    {
+                        TaskRepository.Tasks.Add(new CalendarTask
+                        {
+                            Day         = scheduleGrid.Columns[c].HeaderText,
+                            Time        = dt.TimeOfDay,
+                            Title       = title,
+                            Category    = cat,
+                            IsImportant = false,
+                            IsUrgent    = false
+                        });
+                    }
+                }
+            }
             TaskRepository.Save();
 
             MessageBox.Show("Schedule and tasks saved!", "Save",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        private void SaveTasks() => TaskRepository.Save();
 
         private void BtnExport_Click(object? sender, EventArgs e)
         {
@@ -314,7 +335,6 @@ namespace TimeManagementApp.Forms
             if (dr == DialogResult.Yes)
             {
                 SaveSchedule();
-                SaveTasks();
             }
         }
 
@@ -324,7 +344,6 @@ namespace TimeManagementApp.Forms
             {
                 e.SuppressKeyPress = true;
                 SaveSchedule();
-                SaveTasks();
             }
         }
 
@@ -353,8 +372,11 @@ namespace TimeManagementApp.Forms
         {
             string day       = scheduleGrid.Columns[col].HeaderText;
             string timeLabel = scheduleGrid.Rows[row].Cells[0].Value?.ToString() ?? "";
-            if (!DateTime.TryParseExact(timeLabel, "h:mm tt",
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+            if (!DateTime.TryParseExact(
+                timeLabel, "h:mm tt",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var dt))
                 return;
 
             var task = new CalendarTask
