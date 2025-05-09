@@ -5,34 +5,48 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using TimeManagementApp.Models;
 using TimeManagementApp.Services;
 
 namespace TimeManagementApp.Forms
 {
     public class AnalyticsForm : BaseForm
     {
-        private readonly RichTextBox _output      = new() { Dock = DockStyle.Fill, ReadOnly = true, Font = new Font("Consolas", 10) };
-        private readonly Button      _btnCompute  = new() { Text = "Compute Report",      Dock = DockStyle.Top,    Height = 30 };
-        private readonly Button      _btnSuggest  = new() { Text = "Get AI Suggestions",  Dock = DockStyle.Top,    Height = 30, Enabled = false };
-        private readonly TextBox     _txtFollowup = new() { Dock = DockStyle.Bottom, Height = 24, Enabled = false };
-        private readonly Button      _btnAsk      = new() { Text = "Ask AI",              Dock = DockStyle.Bottom, Height = 30, Enabled = false };
+        // UI elements
+        private readonly RichTextBox _output = new() { 
+            Dock = DockStyle.Fill, ReadOnly = true, Font = new Font("Consolas", 10) 
+        };
+        private readonly Button _btnCompute  = new() { 
+            Text = "Compute Report", Dock = DockStyle.Top,    Height = 30 
+        };
+        private readonly Button _btnSuggest  = new() { 
+            Text = "Get AI Suggestions", Dock = DockStyle.Top,    Height = 30, Enabled = false 
+        };
+        private readonly TextBox _txtFollowup = new() { 
+            Dock = DockStyle.Bottom, Height = 24, Enabled = false 
+        };
+        private readonly Button _btnAsk  = new() { 
+            Text = "Ask AI", Dock = DockStyle.Bottom, Height = 30, Enabled = false 
+        };
 
+        // conversation history for AI
         private readonly List<(string Role, string Content)> _conversation = new();
 
+        // task categories
         private static readonly string[] Categories = { "Work", "Study", "Personal", "Activity" };
 
         public AnalyticsForm()
         {
-            Text       = "Schedule Analytics";
-            ClientSize = new Size(700, 600);
+            Text       = "Schedule Analytics";   
+            ClientSize = new Size(700, 600);     
 
+            // add controls in z-order
             Controls.Add(_output);
             Controls.Add(_btnSuggest);
             Controls.Add(_btnCompute);
             Controls.Add(_txtFollowup);
             Controls.Add(_btnAsk);
 
+            // event handlers
             _btnCompute.Click += ComputeReport_Click;
             _btnSuggest.Click += async (_,__) => await GenerateAISuggestionsAsync();
             _btnAsk.Click     += async (_,__) => await SendFollowupAsync();
@@ -40,25 +54,27 @@ namespace TimeManagementApp.Forms
 
         private void ComputeReport_Click(object sender, EventArgs e)
         {
-            var allTasks  = TaskRepository.Tasks;
-            var unique    = allTasks.GroupBy(t => t.Title).Select(g => g.First()).ToList();
+            // load tasks
+            var allTasks = TaskRepository.Tasks;
+            // dedupe by title
+            var unique   = allTasks.GroupBy(t => t.Title).Select(g => g.First()).ToList();
 
-            int totalUnique     = unique.Count;
-            int impUnique       = unique.Count(t => t.IsImportant);
-            int urgUnique       = unique.Count(t => t.IsUrgent);
-            int bothUnique      = unique.Count(t => t.IsImportant && t.IsUrgent);
+            // basic metrics
+            int totalUnique = unique.Count;
+            int impUnique   = unique.Count(t => t.IsImportant);
+            int urgUnique   = unique.Count(t => t.IsUrgent);
+            int bothUnique  = unique.Count(t => t.IsImportant && t.IsUrgent);
+            int totalHours  = allTasks.Count; 
 
-            // hours = one per actual occurrence
-            int totalHours      = allTasks.Count;
-            // and by category including duplicates
-            var hoursByCatAll   = Categories.ToDictionary(cat => cat, _ => 0);
+            // count hours per category
+            var hoursByCatAll = Categories.ToDictionary(cat => cat, _ => 0);
             foreach (var t in allTasks)
             {
                 var cat = Categories.Contains(t.Category) ? t.Category : "Personal";
                 hoursByCatAll[cat]++;
             }
 
-            // unique count by category for counts
+            // count unique tasks per category
             var countByCatUnique = Categories.ToDictionary(cat => cat, _ => 0);
             foreach (var t in unique)
             {
@@ -66,6 +82,7 @@ namespace TimeManagementApp.Forms
                 countByCatUnique[cat]++;
             }
 
+            // build report text
             var sb = new StringBuilder();
             sb.AppendLine($"Total unique tasks/events: {totalUnique}");
             sb.AppendLine($"Important (unique): {impUnique}");
@@ -80,10 +97,12 @@ namespace TimeManagementApp.Forms
 
             _output.Text = sb.ToString();
 
+            // prepare AI context
             _conversation.Clear();
             _conversation.Add(("system", "You are a helpful productivity AI assistant."));
             _conversation.Add(("user", sb.ToString()));
 
+            // enable next steps
             _btnSuggest.Enabled  = true;
             _txtFollowup.Enabled = false;
             _btnAsk.Enabled      = false;
@@ -94,15 +113,17 @@ namespace TimeManagementApp.Forms
             _btnSuggest.Enabled = false;
             _output.AppendText("\n[AI] Generating suggestions...\n");
 
+            // add user request to conversation
             _conversation.Add(("user",
-                "Please analyze my weekly summary above and:\n" +
-                "1. Identify any overloads or conflicts.\n" +
-                "2. Recommend how to rebalance or reschedule tasks.\n" +
-                "3. Offer two concrete time‑management tips based on their priority mix and categories."));
+                "Please analyze my weekly summary and:\n" +
+                "1. Identify overloads or conflicts.\n" +
+                "2. Recommend how to rebalance tasks.\n" +
+                "3. Offer two concrete time‑management tips."));
 
+            // format prompt
             var prompt = new StringBuilder();
             foreach (var (role, content) in _conversation)
-                prompt.AppendLine($"{(role == "system" ? "[System]" : role == "user" ? "[User]" : "[Assistant]")}: {content}\n");
+                prompt.AppendLine($"{(role == "system" ? "[System]" : "[User]")}: {content}\n");
 
             var response = await OpenAIService.ChatAsync(prompt.ToString());
             _conversation.Add(("assistant", response));
@@ -115,7 +136,7 @@ namespace TimeManagementApp.Forms
         private async Task SendFollowupAsync()
         {
             var question = _txtFollowup.Text.Trim();
-            if (string.IsNullOrEmpty(question)) return;
+            if (question == "") return;    
 
             _output.AppendText($"\n[You]: {question}\n");
             _txtFollowup.Clear();
@@ -123,9 +144,10 @@ namespace TimeManagementApp.Forms
 
             _conversation.Add(("user", question));
 
+            // rebuild prompt
             var prompt = new StringBuilder();
             foreach (var (role, content) in _conversation)
-                prompt.AppendLine($"{(role == "system" ? "[System]" : role == "user" ? "[User]" : "[Assistant]")}: {content}\n");
+                prompt.AppendLine($"{(role == "system" ? "[System]" : "[User]")}: {content}\n");
 
             _output.AppendText("\n[AI] Thinking...\n");
             var reply = await OpenAIService.ChatAsync(prompt.ToString());

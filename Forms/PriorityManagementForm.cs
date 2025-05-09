@@ -9,20 +9,24 @@ namespace TimeManagementApp.Forms
 {
     public class PriorityManagementForm : BaseForm
     {
+        // 2×2 grid for priority quadrants
         private TableLayoutPanel matrix;
+        // listboxes for each quadrant
         private ListBox lbIU, lbIN, lbNU, lbNN;
+        // right‑click menu for toggling flags
         private ContextMenuStrip itemMenu;
 
         public PriorityManagementForm()
         {
-            Text       = "Priority Management";
-            ClientSize = new Size(800, 600);
+            Text       = "Priority Management"; // window title
+            ClientSize = new Size(800, 600);    // initial window size
             InitializeComponent();
-            LoadMatrix();
+            LoadMatrix();                       // populate listboxes
         }
 
         private void InitializeComponent()
         {
+            // configure grid layout
             matrix = new TableLayoutPanel {
                 Dock        = DockStyle.Fill,
                 ColumnCount = 2,
@@ -35,6 +39,7 @@ namespace TimeManagementApp.Forms
             matrix.RowStyles   .Add(new RowStyle   (SizeType.Percent, 50F));
             Controls.Add(matrix);
 
+            // create quadrant listboxes
             lbIU = CreateQuadrant("Important & Urgent");
             lbIN = CreateQuadrant("Important & Not Urgent");
             lbNU = CreateQuadrant("Not Important & Urgent");
@@ -45,10 +50,12 @@ namespace TimeManagementApp.Forms
             matrix.Controls.Add(lbNU.Parent, 0, 1);
             matrix.Controls.Add(lbNN.Parent, 1, 1);
 
+            // setup context menu items
             itemMenu = new ContextMenuStrip { BackColor = BackColor, ForeColor = ForeColor };
             itemMenu.Items.Add("Toggle Important", null, ToggleImportant_Click);
             itemMenu.Items.Add("Toggle Urgent",    null, ToggleUrgent_Click);
 
+            // attach drag/drop and right‑click handlers
             foreach (var lb in new[] { lbIU, lbIN, lbNU, lbNN })
             {
                 lb.MouseDown   += ListBox_MouseDown;
@@ -60,6 +67,7 @@ namespace TimeManagementApp.Forms
 
         private ListBox CreateQuadrant(string title)
         {
+            // wrap ListBox in a labeled GroupBox
             var gb = new GroupBox {
                 Text      = title,
                 Dock      = DockStyle.Fill,
@@ -80,6 +88,7 @@ namespace TimeManagementApp.Forms
 
         private void LoadMatrix()
         {
+            // clear all quadrants
             lbIU.Items.Clear();
             lbIN.Items.Clear();
             lbNU.Items.Clear();
@@ -87,11 +96,10 @@ namespace TimeManagementApp.Forms
 
             var tasks = TaskRepository.Tasks;
 
+            // add each distinct title matching the predicate
             void AddDistinctTitles(ListBox lb, Func<CalendarTask, bool> pred)
             {
-                var titles = tasks.Where(pred)
-                                  .Select(t => t.Title)
-                                  .Distinct();
+                var titles = tasks.Where(pred).Select(t => t.Title).Distinct();
                 foreach (var title in titles)
                     lb.Items.Add(title);
             }
@@ -104,6 +112,7 @@ namespace TimeManagementApp.Forms
 
         private void ListBox_MouseDown(object sender, MouseEventArgs e)
         {
+            // show itemMenu on right‑click
             if (e.Button == MouseButtons.Right)
             {
                 var lb = (ListBox)sender;
@@ -118,16 +127,17 @@ namespace TimeManagementApp.Forms
 
         private void ListBox_DragStart(object sender, MouseEventArgs e)
         {
+            // start drag on left‑click
             if (e.Button != MouseButtons.Left) return;
             var lb = (ListBox)sender;
             int idx = lb.IndexFromPoint(e.Location);
             if (idx < 0) return;
-            var title = lb.Items[idx] as string;
-            lb.DoDragDrop(title, DragDropEffects.Move);
+            lb.DoDragDrop(lb.Items[idx] as string, DragDropEffects.Move);
         }
 
         private void ListBox_DragEnter(object sender, DragEventArgs e)
         {
+            // allow move if dragging a string
             if (e.Data.GetDataPresent(typeof(string)))
                 e.Effect = DragDropEffects.Move;
         }
@@ -138,9 +148,11 @@ namespace TimeManagementApp.Forms
             var title  = e.Data.GetData(typeof(string)) as string;
             if (title == null) return;
 
+            // determine new importance/urgency
             bool imp = target == lbIU || target == lbIN;
             bool urg = target == lbIU || target == lbNU;
 
+            // update matching tasks
             foreach (var t in TaskRepository.Tasks.Where(t => t.Title == title))
             {
                 t.IsImportant = imp;
@@ -152,6 +164,7 @@ namespace TimeManagementApp.Forms
 
         private void ToggleImportant_Click(object sender, EventArgs e)
         {
+            // flip IsImportant for selected title
             var lb = GetCurrentListBox();
             if (lb?.SelectedItem is string title)
             {
@@ -164,6 +177,7 @@ namespace TimeManagementApp.Forms
 
         private void ToggleUrgent_Click(object sender, EventArgs e)
         {
+            // flip IsUrgent for selected title
             var lb = GetCurrentListBox();
             if (lb?.SelectedItem is string title)
             {
@@ -176,6 +190,7 @@ namespace TimeManagementApp.Forms
 
         private ListBox GetCurrentListBox()
         {
+            // return which quadrant has focus
             if (lbIU.Focused) return lbIU;
             if (lbIN.Focused) return lbIN;
             if (lbNU.Focused) return lbNU;
@@ -184,4 +199,3 @@ namespace TimeManagementApp.Forms
         }
     }
 }
-  

@@ -1,14 +1,15 @@
-// Services/ThemeService.cs
 using System;
 using System.Drawing;
 
 namespace TimeManagementApp.Services
 {
+    // Manages app theme state and notifications
     public static class ThemeService
     {
         public enum Theme { Light, Dark, System }
 
         private static Theme _current = Theme.System;
+        // Current theme; raises ThemeChanged when set
         public static Theme Current
         {
             get => _current;
@@ -22,8 +23,10 @@ namespace TimeManagementApp.Services
 
         public static event EventHandler ThemeChanged;
 
+        // Change the theme
         public static void ApplyTheme(Theme theme) => Current = theme;
 
+        // Get background and foreground colors for the current theme
         public static (Color Back, Color Fore) GetColors()
         {
             return Current switch

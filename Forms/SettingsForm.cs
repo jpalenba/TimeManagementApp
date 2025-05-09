@@ -4,18 +4,13 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using TimeManagementApp;       // for BaseForm
-using TimeManagementApp.Services;      // ← Make sure this is here
-
+using TimeManagementApp.Services;
 
 namespace TimeManagementApp.Forms
 {
-    /// <summary>
-    /// User settings & help in one form, persisted to settings.json.
-    /// Inherits shared styling from BaseForm.
-    /// </summary>
     public class SettingsForm : BaseForm
     {
+        // holds app settings
         private class SettingsData
         {
             public bool   EnableNotifications { get; set; } = true;
@@ -27,14 +22,17 @@ namespace TimeManagementApp.Forms
 
         private SettingsData settings = new();
 
+        // UI tabs
         private readonly TabControl tabControl      = new();
         private readonly TabPage    tabSettings     = new();
         private readonly TabPage    tabHelp         = new();
 
+        // settings controls
         private readonly CheckBox   chkNotifications = new();
         private readonly ComboBox   cmbTheme         = new();
         private readonly Button     btnApply         = new();
 
+        // help text area
         private readonly RichTextBox txtHelp         = new();
 
         public SettingsForm()
@@ -42,50 +40,47 @@ namespace TimeManagementApp.Forms
             Text       = "Settings & Help";
             ClientSize = new Size(600, 450);
 
-            LoadSettingsFromFile();
-            InitializeComponent();
-            PopulateControls();
+            LoadSettingsFromFile();  // load existing settings
+            InitializeComponent();   // build UI
+            PopulateControls();      // set control values
         }
 
         private void InitializeComponent()
         {
             SuspendLayout();
 
-            // TabControl
+            // main TabControl
             tabControl.Dock      = DockStyle.Fill;
-            tabControl.Font      = this.Font;
-            tabControl.BackColor = this.BackColor;
-            tabControl.ForeColor = this.ForeColor;
+            tabControl.Font      = Font;
+            tabControl.BackColor = BackColor;
+            tabControl.ForeColor = ForeColor;
             tabControl.TabPages.AddRange(new[] { tabSettings, tabHelp });
             Controls.Add(tabControl);
 
-            // --- Settings Tab ---
+            // Settings tab layout
             tabSettings.Text      = "Settings";
-            tabSettings.BackColor = this.BackColor;
-            tabSettings.ForeColor = this.ForeColor;
+            tabSettings.BackColor = BackColor;
+            tabSettings.ForeColor = ForeColor;
 
-            // Notifications checkbox
             chkNotifications.Text     = "Enable desktop notifications";
             chkNotifications.AutoSize = true;
-            chkNotifications.Font     = this.Font;
+            chkNotifications.Font     = Font;
             chkNotifications.Top      = 20;
             chkNotifications.Left     = 20;
             tabSettings.Controls.Add(chkNotifications);
 
-            // Theme label
             var lblTheme = new Label {
                 Text      = "App theme:",
                 AutoSize  = true,
-                Font      = this.Font,
-                ForeColor = this.ForeColor,
-                BackColor = this.BackColor,
+                Font      = Font,
+                ForeColor = ForeColor,
+                BackColor = BackColor,
                 Top       = chkNotifications.Bottom + 20,
                 Left      = 20
             };
             tabSettings.Controls.Add(lblTheme);
 
-            // Theme combo
-            cmbTheme.Font          = this.Font;
+            cmbTheme.Font          = Font;
             cmbTheme.Top           = lblTheme.Bottom + 6;
             cmbTheme.Left          = 20;
             cmbTheme.Width         = 200;
@@ -93,35 +88,63 @@ namespace TimeManagementApp.Forms
             cmbTheme.Items.AddRange(new[] { "Light", "Dark", "System Default" });
             tabSettings.Controls.Add(cmbTheme);
 
-            // Apply button
             btnApply.Text      = "Apply";
-            btnApply.Font      = this.Font;
-            btnApply.BackColor = ControlPaint.Light(this.BackColor);
-            btnApply.ForeColor = this.ForeColor;
+            btnApply.Font      = Font;
+            btnApply.BackColor = ControlPaint.Light(BackColor);
+            btnApply.ForeColor = ForeColor;
             btnApply.AutoSize  = true;
             btnApply.Top       = cmbTheme.Bottom + 30;
             btnApply.Left      = 20;
-            btnApply.Click    += BtnApply_Click;
+            btnApply.Click    += BtnApply_Click;  // save and apply
             tabSettings.Controls.Add(btnApply);
 
-            // --- Help Tab ---
+            // Help tab layout
             tabHelp.Text       = "Help";
-            tabHelp.BackColor  = this.BackColor;
-            tabHelp.ForeColor  = this.ForeColor;
+            tabHelp.BackColor  = BackColor;
+            tabHelp.ForeColor  = ForeColor;
 
             txtHelp.ReadOnly   = true;
             txtHelp.Dock       = DockStyle.Fill;
-            txtHelp.Font       = this.Font;
-            txtHelp.BackColor  = this.BackColor;
-            txtHelp.ForeColor  = this.ForeColor;
-            txtHelp.Text       =
-@"TimeManagementApp Help
+            txtHelp.Font       = new Font("Consolas", 10);
+            txtHelp.BackColor  = BackColor;
+            txtHelp.ForeColor  = ForeColor;
+            txtHelp.Text =
+@"Welcome to TimeManagementApp!
 
-– To add an event: double‑click any cell in the calendar.
-– Save your schedule any time with the 💾 button or Ctrl+S.
-– Export your week to CSV via ⇩ Export CSV.
-– In Settings you can toggle notifications and pick a theme.
-– Your choices are saved automatically to settings.json.";
+— Main Menu —
+• Navigate between Calendar, Priorities, Analytics, and Settings using the sidebar.
+• Resize or move the window using the title bar controls.
+
+— Calendar —
+1. When you open Calendar, choose:
+   • Yes to load your saved schedule.
+   • No to start with a blank calendar.
+2. Double‑click any cell to add or edit an event:
+   • Enter a description and select a category (Work, Study, Personal, Activity).
+   • You can select multiple cells before confirming to add the same event to all.
+3. Right‑click any cell to clear its contents.
+4. Click 💾 Save (or press Ctrl+S) to save both your calendar and task data.
+5. Click ⇩ Export CSV to download your week as a spreadsheet.
+
+— Priorities —
+• Drag and drop tasks between quadrants (Important/Urgent) to change their status.
+• Right‑click any task title to toggle its Important or Urgent flag.
+• Tasks sharing the same title are grouped together—moving or toggling one updates all duplicates.
+
+— Analytics —
+1. Click Compute Report to see:
+   • Total tasks this week, grouped uniquely by title.
+   • Counts of Important, Urgent, and both.
+   • Total estimated hours (one hour per occurrence) and breakdown by category.
+2. Get AI Suggestions for personalized rebalancing and time‑management tips.
+3. Use the Ask AI box to follow up with any additional questions.
+
+— Settings —
+• Enable or disable desktop notifications.
+• Choose between Light, Dark, or System Default theme.
+• Click Apply to save and instantly update the app.
+
+All your settings are saved automatically to **settings.json**. Enjoy staying organized!";
             tabHelp.Controls.Add(txtHelp);
 
             ResumeLayout(false);
@@ -134,25 +157,27 @@ namespace TimeManagementApp.Forms
         }
 
         private void BtnApply_Click(object? sender, EventArgs e)
-{
-        // ... save to settings.json ...
-        SaveSettingsToFile();
-
-        // immediately apply new theme
-        var sel = cmbTheme.SelectedItem?.ToString() ?? "System Default";
-        var theme = sel switch
         {
-            "Light"           => ThemeService.Theme.Light,
-            "Dark"            => ThemeService.Theme.Dark,
-            _                 => ThemeService.Theme.System
-        };
-        ThemeService.ApplyTheme(theme);
+            // update settings from UI
+            settings.EnableNotifications = chkNotifications.Checked;
+            settings.AppTheme            = cmbTheme.SelectedItem?.ToString() ?? "System Default";
+            SaveSettingsToFile();
 
-        MessageBox.Show("Settings saved!", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-}
+            // apply selected theme
+            var theme = settings.AppTheme switch
+            {
+                "Light"           => ThemeService.Theme.Light,
+                "Dark"            => ThemeService.Theme.Dark,
+                _                 => ThemeService.Theme.System
+            };
+            ThemeService.ApplyTheme(theme);
+
+            MessageBox.Show("Settings saved!", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
 
         private void LoadSettingsFromFile()
         {
+            // read settings.json if present
             try
             {
                 if (File.Exists(settingsPath))
@@ -169,6 +194,7 @@ namespace TimeManagementApp.Forms
 
         private void SaveSettingsToFile()
         {
+            // write settings.json
             try
             {
                 var json = JsonConvert.SerializeObject(settings, Formatting.Indented);
@@ -176,8 +202,7 @@ namespace TimeManagementApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to save settings:\n{ex.Message}",
-                                Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Failed to save settings:\n{ex.Message}", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

@@ -1,13 +1,11 @@
-// Services/SettingsLoader.cs
 using System;
 using System.IO;
 using Newtonsoft.Json;
-using TimeManagementApp.Services;
 
 namespace TimeManagementApp.Services
 {
     /// <summary>
-    /// Reads your settings.json and returns the saved Theme.
+    /// Loads the saved app theme from settings.json.
     /// </summary>
     public static class SettingsLoader
     {
@@ -17,15 +15,19 @@ namespace TimeManagementApp.Services
             public string AppTheme           { get; set; } = "System Default";
         }
 
+        // location of the settings file
         private static readonly string settingsPath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
+        /// <summary>
+        /// Reads settings.json and returns the stored Theme.
+        /// </summary>
         public static ThemeService.Theme LoadTheme()
         {
             try
             {
                 if (!File.Exists(settingsPath))
-                    return ThemeService.Theme.System;
+                    return ThemeService.Theme.System;  // default if missing
 
                 var json = File.ReadAllText(settingsPath);
                 var data = JsonConvert.DeserializeObject<SettingsData>(json)
@@ -40,6 +42,7 @@ namespace TimeManagementApp.Services
             }
             catch
             {
+                // fallback on error
                 return ThemeService.Theme.System;
             }
         }

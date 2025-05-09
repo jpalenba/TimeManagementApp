@@ -1,7 +1,5 @@
-// Program.cs
 using System;
 using System.Windows.Forms;
-using TimeManagementApp.Forms;
 using TimeManagementApp.Services;   // for ThemeService and SettingsLoader
 
 namespace TimeManagementApp

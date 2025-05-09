@@ -1,30 +1,26 @@
-// File: TaskRepository.cs
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
-using TimeManagementApp.Models;        
+using TimeManagementApp.Models;
 
 namespace TimeManagementApp.Services
 {
     public static class TaskRepository
     {
+        // path to the JSON file on disk
         private static readonly string FilePath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tasks.json");
 
-        /// <summary>
-        /// In‑memory list of all CalendarTask entries.
-        /// </summary>
+        // in-memory list of all tasks
         public static List<CalendarTask> Tasks { get; private set; }
 
         static TaskRepository()
         {
-            Load();
+            Load(); // initialize Tasks from disk
         }
 
-        /// <summary>
-        /// Loads the task list from disk (tasks.json) into memory.
-        /// </summary>
+        // load tasks.json into memory
         public static void Load()
         {
             if (File.Exists(FilePath))
@@ -39,9 +35,7 @@ namespace TimeManagementApp.Services
             }
         }
 
-        /// <summary>
-        /// Persists the current in‑memory task list back to disk.
-        /// </summary>
+        // write in-memory tasks back to disk
         public static void Save()
         {
             File.WriteAllText(
@@ -50,11 +44,7 @@ namespace TimeManagementApp.Services
             );
         }
 
-        /// <summary>
-        /// Inserts or updates a task.  If a task for the same day/time exists,
-        /// updates its Title, Category, IsImportant and IsUrgent flags.
-        /// Otherwise adds the new task.
-        /// </summary>
+        // add new task or update existing one by day/time
         public static void Upsert(CalendarTask t)
         {
             var existing = Tasks.Find(x => x.Day == t.Day && x.Time == t.Time);
@@ -72,9 +62,7 @@ namespace TimeManagementApp.Services
             Save();
         }
 
-        /// <summary>
-        /// Removes all tasks for the given day/time.
-        /// </summary>
+        // remove all tasks matching day/time
         public static void Remove(CalendarTask t)
         {
             Tasks.RemoveAll(x => x.Day == t.Day && x.Time == t.Time);

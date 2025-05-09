@@ -4,24 +4,23 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using TimeManagementApp;
 
 namespace TimeManagementApp.Forms
 {
     /// <summary>
-    /// Small dialog that lists every saved schedule snapshot and lets the
-    /// user pick one to load.
+    /// Dialog listing saved schedule snapshots for user selection.
     /// </summary>
     public partial class SelectScheduleForm : Form
     {
-        private readonly ListBox listBoxSchedules = new();
-        private readonly Button  btnOK            = new();
-        private readonly Button  btnCancel        = new();
+        // UI controls
+        private readonly ListBox listBoxSchedules = new();  // shows timestamps
+        private readonly Button  btnOK            = new();  // confirm selection
+        private readonly Button  btnCancel        = new();  // cancel dialog
 
-        private readonly List<ScheduleEntry> _entries;
+        private readonly List<ScheduleEntry> _entries;      // available snapshots
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ScheduleEntry? SelectedEntry { get; private set; }
+        public ScheduleEntry? SelectedEntry { get; private set; }  // chosen snapshot
 
         public SelectScheduleForm(List<ScheduleEntry> entries)
         {
@@ -29,33 +28,30 @@ namespace TimeManagementApp.Forms
             InitializeComponent();
         }
 
-        // ---------- UI ----------------------------------------------------
         private void InitializeComponent()
         {
             SuspendLayout();
 
-            // listBoxSchedules
+            // populate list box with entry timestamps
             listBoxSchedules.Dock   = DockStyle.Top;
             listBoxSchedules.Height = 220;
-            listBoxSchedules.Font   = this.Font;        // New: consistent font
+            listBoxSchedules.Font   = Font;
             foreach (var entry in _entries)
-            {
                 listBoxSchedules.Items.Add(entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
-            }
 
-            // btnOK
+            // OK button
             btnOK.Text   = "OK";
             btnOK.Dock   = DockStyle.Left;
             btnOK.Width  = 100;
             btnOK.Click += BtnOK_Click;
 
-            // btnCancel
+            // Cancel button
             btnCancel.Text   = "Cancel";
             btnCancel.Dock   = DockStyle.Right;
             btnCancel.Width  = 100;
             btnCancel.Click += (_, _) => DialogResult = DialogResult.Cancel;
 
-            // form
+            // form layout
             ClientSize = new Size(360, 260);
             Controls.Add(listBoxSchedules);
             Controls.Add(btnOK);
@@ -65,32 +61,31 @@ namespace TimeManagementApp.Forms
             ResumeLayout(false);
         }
 
-        // ---------- events ------------------------------------------------
         private void BtnOK_Click(object? sender, EventArgs e)
         {
             int ix = listBoxSchedules.SelectedIndex;
             if (ix >= 0 && ix < _entries.Count)
             {
-                SelectedEntry = _entries[ix];
+                SelectedEntry = _entries[ix];     // set selection
                 DialogResult  = DialogResult.OK;
             }
             else
             {
-                MessageBox.Show("Please select a schedule first.");
+                MessageBox.Show("Please select a schedule first.");  // prompt if none
             }
         }
     }
 
-    // --------------------------------------------------------------------
-    // Data-transfer object representing one saved weekly grid.
-    // --------------------------------------------------------------------
+    /// <summary>
+    /// Represents a saved weekly schedule snapshot.
+    /// </summary>
     public class ScheduleEntry
     {
-        /// <summary>When the user pressed “Save”.</summary>
+        /// <summary>Timestamp when the user saved.</summary>
         public DateTime Timestamp { get; set; }
 
         /// <summary>
-        /// Raw grid rows; each string[] = Time, Monday … Sunday.
+        /// Grid data: each string[] has Time, Monday … Sunday.
         /// </summary>
         public List<string[]> ScheduleData { get; set; } = new();
     }

@@ -35,7 +35,7 @@ namespace TimeManagementApp.Models
         /// <summary>
         /// New: Category of this event ("Work", "Study", "Personal", "Activity").
         /// </summary>
-        public string Category    { get; set; } = "Personal";  // added
+        public string Category    { get; set; } = "Personal";  
 
         public bool Equals(CalendarTask other)
         {
@@ -45,13 +45,13 @@ namespace TimeManagementApp.Models
                 && Title       == other.Title
                 && IsImportant == other.IsImportant
                 && IsUrgent    == other.IsUrgent
-                && Category    == other.Category;  // include in equality
+                && Category    == other.Category;  
         }
 
         public override bool Equals(object obj) =>
             obj is CalendarTask ct && Equals(ct);
 
         public override int GetHashCode() =>
-            HashCode.Combine(Day, Time, Title, IsImportant, IsUrgent, Category);  // include Category
+            HashCode.Combine(Day, Time, Title, IsImportant, IsUrgent, Category);  
     }
 }

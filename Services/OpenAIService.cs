@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace TimeManagementApp.Services
 {
     public static class OpenAIService
     {
-        /// <summary>
-        /// Sends a free‐form prompt to OpenAI and returns only the assistant’s text.
-        /// </summary>
+        // Send a free‑form user prompt and return only the assistant’s response text
         public static async Task<string> ChatAsync(string userPrompt)
         {
             var (content, headers) = await OpenAIHttpService.ChatCompletionAsync(
@@ -19,13 +16,9 @@ namespace TimeManagementApp.Services
             return content;
         }
 
-        /// <summary>
-        /// Builds a time‐allocation prompt from hours‐per‐category,
-        /// calls the HTTP helper, and returns just the AI’s reply text.
-        /// </summary>
+        // Build a time‑allocation prompt from category hours and return the AI’s suggestions
         public static async Task<string> SuggestTimeAnalyticsAsync(Dictionary<string, double> hoursPerCategory)
         {
-            // Rebuild your prompt string here exactly as before:
             var lines = hoursPerCategory
                 .OrderByDescending(kv => kv.Value)
                 .Select(kv => $"- {kv.Key}: {kv.Value:F1}h");
@@ -34,7 +27,7 @@ namespace TimeManagementApp.Services
                           + "\n\nCan you suggest how I might reallocate my time to improve productivity, reduce burnout, or balance my schedule better?";
 
             var (content, headers) = await OpenAIHttpService.ChatCompletionAsync(
-                "You are a helpful time‐management analyst.",
+                "You are a helpful time‑management analyst.",
                 prompt
             );
             return content;
