@@ -1,6 +1,6 @@
 using System;
 using System.Windows.Forms;
-using TimeManagementApp.Services;   // for ThemeService and SettingsLoader
+using TimeManagementApp.Services;   
 
 namespace TimeManagementApp
 {
