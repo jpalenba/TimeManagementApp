@@ -59,11 +59,7 @@ namespace TimeManagementApp.Forms
             if (dlg == DialogResult.Yes && File.Exists("schedule.json"))
                 LoadSchedule();
             else
-            {
                 InitializeScheduleGrid();
-                TaskRepository.Tasks.Clear();
-                TaskRepository.Save();
-            }
         }
 
         private void InitializeComponent()
@@ -127,7 +123,6 @@ namespace TimeManagementApp.Forms
         {
             scheduleGrid.Columns.Clear();
             scheduleGrid.Rows.Clear();
-
             foreach (var d in Days)
                 scheduleGrid.Columns.Add(d, d);
 
@@ -165,7 +160,7 @@ namespace TimeManagementApp.Forms
 
         private void SaveSchedule()
         {
-            // save grid to schedule.json
+            // persist grid to schedule.json
             var rows = scheduleGrid.Rows
                 .Cast<DataGridViewRow>()
                 .Where(r => !r.IsNewRow)
@@ -177,7 +172,7 @@ namespace TimeManagementApp.Forms
             File.WriteAllText("schedule.json",
                 JsonConvert.SerializeObject(rows, Formatting.Indented));
 
-            // overwrite tasks.json from grid contents
+            // rebuild tasks.json from grid contents
             TaskRepository.Tasks.Clear();
             for (int r = 0; r < scheduleGrid.Rows.Count; r++)
             {
@@ -235,7 +230,6 @@ namespace TimeManagementApp.Forms
         private void ScheduleGrid_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex <= 0) return;
-
             string day      = scheduleGrid.Columns[e.ColumnIndex].HeaderText;
             string timeText = scheduleGrid.Rows[e.RowIndex].Cells[0].Value?.ToString() ?? "";
 
@@ -333,9 +327,7 @@ namespace TimeManagementApp.Forms
                 return;
             }
             if (dr == DialogResult.Yes)
-            {
                 SaveSchedule();
-            }
         }
 
         private void CalendarForm_KeyDown(object? sender, KeyEventArgs e)
