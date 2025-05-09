@@ -8,6 +8,14 @@
     "Category": "Work"
   },
   {
+    "Title": "Prayer",
+    "Day": "Wednesday",
+    "Time": "06:00:00",
+    "IsImportant": true,
+    "IsUrgent": false,
+    "Category": "Personal"
+  },
+  {
     "Title": "Work",
     "Day": "Monday",
     "Time": "07:00:00",
@@ -16,19 +24,11 @@
     "Category": "Work"
   },
   {
-    "Title": "Church",
-    "Day": "Thursday",
+    "Title": "Prayer",
+    "Day": "Wednesday",
     "Time": "07:00:00",
     "IsImportant": true,
     "IsUrgent": false,
-    "Category": "Activity"
-  },
-  {
-    "Title": "Prayers",
-    "Day": "Saturday",
-    "Time": "07:00:00",
-    "IsImportant": false,
-    "IsUrgent": true,
     "Category": "Personal"
   },
   {
@@ -40,30 +40,30 @@
     "Category": "Work"
   },
   {
-    "Title": "Class",
+    "Title": "Gym",
     "Day": "Tuesday",
     "Time": "08:00:00",
+    "IsImportant": false,
+    "IsUrgent": true,
+    "Category": "Activity"
+  },
+  {
+    "Title": "Prayer",
+    "Day": "Wednesday",
+    "Time": "08:00:00",
     "IsImportant": true,
+    "IsUrgent": false,
+    "Category": "Personal"
+  },
+  {
+    "Title": "Math",
+    "Day": "Friday",
+    "Time": "08:00:00",
+    "IsImportant": false,
     "IsUrgent": true,
     "Category": "Study"
   },
   {
-    "Title": "Church",
-    "Day": "Thursday",
-    "Time": "08:00:00",
-    "IsImportant": true,
-    "IsUrgent": false,
-    "Category": "Activity"
-  },
-  {
-    "Title": "Prayers",
-    "Day": "Saturday",
-    "Time": "08:00:00",
-    "IsImportant": false,
-    "IsUrgent": true,
-    "Category": "Personal"
-  },
-  {
     "Title": "Work",
     "Day": "Monday",
     "Time": "09:00:00",
@@ -72,28 +72,20 @@
     "Category": "Work"
   },
   {
-    "Title": "Class",
+    "Title": "Gym",
     "Day": "Tuesday",
-    "Time": "09:00:00",
-    "IsImportant": true,
-    "IsUrgent": true,
-    "Category": "Study"
-  },
-  {
-    "Title": "Church",
-    "Day": "Thursday",
-    "Time": "09:00:00",
-    "IsImportant": true,
-    "IsUrgent": false,
-    "Category": "Activity"
-  },
-  {
-    "Title": "Prayers",
-    "Day": "Saturday",
     "Time": "09:00:00",
     "IsImportant": false,
     "IsUrgent": true,
-    "Category": "Personal"
+    "Category": "Activity"
+  },
+  {
+    "Title": "Math",
+    "Day": "Friday",
+    "Time": "09:00:00",
+    "IsImportant": false,
+    "IsUrgent": true,
+    "Category": "Study"
   },
   {
     "Title": "Work",
@@ -104,51 +96,19 @@
     "Category": "Work"
   },
   {
-    "Title": "Class",
+    "Title": "Gym",
     "Day": "Tuesday",
-    "Time": "10:00:00",
-    "IsImportant": true,
-    "IsUrgent": true,
-    "Category": "Study"
-  },
-  {
-    "Title": "Prayers",
-    "Day": "Saturday",
     "Time": "10:00:00",
     "IsImportant": false,
     "IsUrgent": true,
-    "Category": "Personal"
+    "Category": "Activity"
   },
   {
-    "Title": "Work",
-    "Day": "Monday",
-    "Time": "11:00:00",
-    "IsImportant": true,
+    "Title": "Math",
+    "Day": "Friday",
+    "Time": "10:00:00",
+    "IsImportant": false,
     "IsUrgent": true,
-    "Category": "Work"
-  },
-  {
-    "Title": "Work",
-    "Day": "Monday",
-    "Time": "12:00:00",
-    "IsImportant": true,
-    "IsUrgent": true,
-    "Category": "Work"
-  },
-  {
-    "Title": "Work",
-    "Day": "Monday",
-    "Time": "13:00:00",
-    "IsImportant": true,
-    "IsUrgent": true,
-    "Category": "Work"
-  },
-  {
-    "Title": "Work",
-    "Day": "Monday",
-    "Time": "14:00:00",
-    "IsImportant": true,
-    "IsUrgent": true,
-    "Category": "Work"
+    "Category": "Study"
   }
 ]

@@ -49,4 +49,3 @@ C:\Users\palen\Documents\ITCS Project\TimeManagementApp\obj\Debug\net8.0-windows
 C:\Users\palen\Documents\ITCS Project\TimeManagementApp\bin\Debug\net8.0-windows\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\palen\Documents\ITCS Project\TimeManagementApp\bin\Debug\net8.0-windows\OpenAI_API.dll
 C:\Users\palen\Documents\ITCS Project\TimeManagementApp\obj\Debug\net8.0-windows\TimeManagementApp.sourcelink.json
-C:\Users\palen\Documents\ITCS Project\TimeManagementApp\bin\Debug\net8.0-windows\schedule.json
