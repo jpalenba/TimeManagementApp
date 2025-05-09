@@ -1,5 +1,8 @@
+// Program.cs
 using System;
 using System.Windows.Forms;
+using TimeManagementApp.Forms;
+using TimeManagementApp.Services;   // for ThemeService and SettingsLoader
 
 namespace TimeManagementApp
 {
@@ -10,6 +13,11 @@ namespace TimeManagementApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // load persisted theme from settings.json
+            var theme = SettingsLoader.LoadTheme();
+            ThemeService.ApplyTheme(theme);
+
             Application.Run(new MainMenuForm());
         }
     }

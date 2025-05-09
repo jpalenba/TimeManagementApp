@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using TimeManagementApp;
 
 namespace TimeManagementApp.Forms
 {
@@ -36,6 +37,7 @@ namespace TimeManagementApp.Forms
             // listBoxSchedules
             listBoxSchedules.Dock   = DockStyle.Top;
             listBoxSchedules.Height = 220;
+            listBoxSchedules.Font   = this.Font;        // New: consistent font
             foreach (var entry in _entries)
             {
                 listBoxSchedules.Items.Add(entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -54,7 +56,7 @@ namespace TimeManagementApp.Forms
             btnCancel.Click += (_, _) => DialogResult = DialogResult.Cancel;
 
             // form
-            ClientSize = new Size(340, 260);
+            ClientSize = new Size(360, 260);
             Controls.Add(listBoxSchedules);
             Controls.Add(btnOK);
             Controls.Add(btnCancel);

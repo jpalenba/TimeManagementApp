@@ -90,10 +90,11 @@ namespace TimeManagementApp
             };
             sidebar.Controls.Add(buttonPanel);
 
-            btnCalendar           = CreateNavButton("📅 Calendar",   (s, e) => new CalendarForm(true).ShowDialog());
+            // single CalendarForm prompt handles load/create
+            btnCalendar           = CreateNavButton("📅 Calendar",   (s, e) => new CalendarForm().ShowDialog());
             btnPriorityManagement = CreateNavButton("🔥 Priorities", (s, e) => new PriorityManagementForm().ShowDialog());
             btnAnalytics          = CreateNavButton("📈 Analytics",  (s, e) => new AnalyticsForm().ShowDialog());
-            btnSettings           = CreateNavButton("⚙️ Settings",   (s, e) => MessageBox.Show("Settings/Help clicked!"));
+            btnSettings           = CreateNavButton("⚙️ Settings/Help",   (s, e) => new SettingsForm().ShowDialog());
 
             buttonPanel.Controls.AddRange(new Control[]
             {
@@ -127,8 +128,7 @@ namespace TimeManagementApp
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
                 BackColor       = calendarPanel.BackColor,
                 ForeColor       = Color.White,
-                Margin          = new Padding(10, header.Height + 5, 5, 5) 
-
+                Margin          = new Padding(10, header.Height + 5, 5, 5)
             };
             calendarPanel.Controls.Add(calendarTable);
 
@@ -209,7 +209,6 @@ namespace TimeManagementApp
             int      totalCells  = offset + daysInMonth;
             int      dataRows    = (int)Math.Ceiling(totalCells / 7.0);
 
-            // rebuild columns & rows
             calendarTable.ColumnStyles.Clear();
             calendarTable.RowStyles.Clear();
             calendarTable.ColumnCount = 7;
@@ -223,7 +222,6 @@ namespace TimeManagementApp
             for (int r = 0; r < dataRows + 1; r++)
                 calendarTable.RowStyles.Add(new RowStyle(SizeType.Percent, rowPct));
 
-            // weekday headers
             string[] days = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
             for (int c = 0; c < 7; c++)
             {
@@ -237,7 +235,6 @@ namespace TimeManagementApp
                 calendarTable.Controls.Add(lbl, c, 0);
             }
 
-            // date cells
             int col = offset, row = 1;
             for (int d = 1; d <= daysInMonth; d++)
             {
@@ -263,13 +260,12 @@ namespace TimeManagementApp
         private void LayoutButtons()
         {
             int navHeight = (WindowState == FormWindowState.Maximized) ? 260 : 140;
-
             int y = TopMargin;
             foreach (Control c in buttonPanel.Controls)
             {
                 c.Left   = (SidebarWidth - ButtonWidth) / 2;
                 c.Width  = ButtonWidth;
-                c.Height = navHeight;       // use computed height
+                c.Height = navHeight;
                 c.Top    = y;
                 y       += c.Height + ButtonSpacing;
             }

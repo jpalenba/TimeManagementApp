@@ -7,37 +7,34 @@ using TimeManagementApp.Services;
 
 namespace TimeManagementApp.Forms
 {
-    public class PriorityManagementForm : Form
+    public class PriorityManagementForm : BaseForm
     {
         private TableLayoutPanel matrix;
-        private ListBox lbIU, lbIN, lbNU, lbNN;     // four quadrants
+        private ListBox lbIU, lbIN, lbNU, lbNN;
         private ContextMenuStrip itemMenu;
 
         public PriorityManagementForm()
         {
+            Text       = "Priority Management";
+            ClientSize = new Size(800, 600);
             InitializeComponent();
             LoadMatrix();
         }
 
         private void InitializeComponent()
         {
-            Text       = "Priority Management";
-            ClientSize = new Size(800, 600);
-
-            // 1) Matrix layout: 2x2
             matrix = new TableLayoutPanel {
                 Dock        = DockStyle.Fill,
                 ColumnCount = 2,
-                RowCount    = 2
+                RowCount    = 2,
+                BackColor   = BackColor
             };
-            // equally divide
             matrix.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             matrix.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             matrix.RowStyles   .Add(new RowStyle   (SizeType.Percent, 50F));
             matrix.RowStyles   .Add(new RowStyle   (SizeType.Percent, 50F));
             Controls.Add(matrix);
 
-            // 2) Build each quadrant as a GroupBox + ListBox
             lbIU = CreateQuadrant("Important & Urgent");
             lbIN = CreateQuadrant("Important & Not Urgent");
             lbNU = CreateQuadrant("Not Important & Urgent");
@@ -48,92 +45,143 @@ namespace TimeManagementApp.Forms
             matrix.Controls.Add(lbNU.Parent, 0, 1);
             matrix.Controls.Add(lbNN.Parent, 1, 1);
 
-            // 3) Shared context‐menu to toggle flags
-            itemMenu = new ContextMenuStrip();
+            itemMenu = new ContextMenuStrip { BackColor = BackColor, ForeColor = ForeColor };
             itemMenu.Items.Add("Toggle Important", null, ToggleImportant_Click);
             itemMenu.Items.Add("Toggle Urgent",    null, ToggleUrgent_Click);
 
-            // Hook right‐click to show the menu on any ListBox
             foreach (var lb in new[] { lbIU, lbIN, lbNU, lbNN })
-                lb.MouseDown += ListBox_MouseDown;
+            {
+                lb.MouseDown   += ListBox_MouseDown;
+                lb.MouseDown   += ListBox_DragStart;
+                lb.DragEnter   += ListBox_DragEnter;
+                lb.DragDrop    += ListBox_DragDrop;
+            }
         }
 
-        // Factory for quadrant + label
         private ListBox CreateQuadrant(string title)
         {
             var gb = new GroupBox {
-                Text     = title,
-                Dock     = DockStyle.Fill,
-                Margin   = new Padding(4)
+                Text      = title,
+                Dock      = DockStyle.Fill,
+                Font      = Font,
+                ForeColor = ForeColor,
+                BackColor = BackColor,
+                Margin    = new Padding(4)
             };
             var lb = new ListBox {
-                Dock   = DockStyle.Fill,
-                Font   = new Font("Segoe UI", 10),
-                Margin = new Padding(4)
+                Dock      = DockStyle.Fill,
+                Font      = Font,
+                Margin    = new Padding(4),
+                AllowDrop = true
             };
             gb.Controls.Add(lb);
             return lb;
         }
 
-        // Populate each ListBox from the shared TaskRepository.Tasks
         private void LoadMatrix()
         {
-            // clear
             lbIU.Items.Clear();
             lbIN.Items.Clear();
             lbNU.Items.Clear();
             lbNN.Items.Clear();
 
-            foreach (var t in TaskRepository.Tasks)
+            var tasks = TaskRepository.Tasks;
+
+            void AddDistinctTitles(ListBox lb, Func<CalendarTask, bool> pred)
             {
-                string label = $"{t.Title} ({t.Day} {DateTime.Today.Add(t.Time):h:mm tt})";
-                if (t.IsImportant && t.IsUrgent)          lbIU.Items.Add(t);
-                else if (t.IsImportant && !t.IsUrgent)    lbIN.Items.Add(t);
-                else if (!t.IsImportant && t.IsUrgent)    lbNU.Items.Add(t);
-                else                                       lbNN.Items.Add(t);
+                var titles = tasks.Where(pred)
+                                  .Select(t => t.Title)
+                                  .Distinct();
+                foreach (var title in titles)
+                    lb.Items.Add(title);
             }
 
-            // show text properly
-            foreach (var lb in new[] { lbIU, lbIN, lbNU, lbNN })
-                lb.DisplayMember = "Title";
+            AddDistinctTitles(lbIU, t => t.IsImportant && t.IsUrgent);
+            AddDistinctTitles(lbIN, t => t.IsImportant && !t.IsUrgent);
+            AddDistinctTitles(lbNU, t => !t.IsImportant && t.IsUrgent);
+            AddDistinctTitles(lbNN, t => !t.IsImportant && !t.IsUrgent);
         }
 
-        // On right-click, select item under cursor and show menu
         private void ListBox_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButtons.Right) return;
+            if (e.Button == MouseButtons.Right)
+            {
+                var lb = (ListBox)sender;
+                int idx = lb.IndexFromPoint(e.Location);
+                if (idx >= 0)
+                {
+                    lb.SelectedIndex = idx;
+                    itemMenu.Show(lb, e.Location);
+                }
+            }
+        }
+
+        private void ListBox_DragStart(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
             var lb = (ListBox)sender;
             int idx = lb.IndexFromPoint(e.Location);
             if (idx < 0) return;
-            lb.SelectedIndex = idx;
-            itemMenu.Show(lb, e.Location);
+            var title = lb.Items[idx] as string;
+            lb.DoDragDrop(title, DragDropEffects.Move);
         }
 
-        // Menu handlers toggle the corresponding flag and refresh
+        private void ListBox_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(string)))
+                e.Effect = DragDropEffects.Move;
+        }
+
+        private void ListBox_DragDrop(object sender, DragEventArgs e)
+        {
+            var target = (ListBox)sender;
+            var title  = e.Data.GetData(typeof(string)) as string;
+            if (title == null) return;
+
+            bool imp = target == lbIU || target == lbIN;
+            bool urg = target == lbIU || target == lbNU;
+
+            foreach (var t in TaskRepository.Tasks.Where(t => t.Title == title))
+            {
+                t.IsImportant = imp;
+                t.IsUrgent    = urg;
+                TaskRepository.Upsert(t);
+            }
+            LoadMatrix();
+        }
+
         private void ToggleImportant_Click(object sender, EventArgs e)
         {
-            if (!(GetCurrentListBox()?.SelectedItem is CalendarTask t)) return;
-            t.IsImportant = !t.IsImportant;
-            TaskRepository.Upsert(t);
-            LoadMatrix();
+            var lb = GetCurrentListBox();
+            if (lb?.SelectedItem is string title)
+            {
+                foreach (var t in TaskRepository.Tasks.Where(t => t.Title == title))
+                    t.IsImportant = !t.IsImportant;
+                TaskRepository.Save();
+                LoadMatrix();
+            }
         }
 
         private void ToggleUrgent_Click(object sender, EventArgs e)
         {
-            if (!(GetCurrentListBox()?.SelectedItem is CalendarTask t)) return;
-            t.IsUrgent = !t.IsUrgent;
-            TaskRepository.Upsert(t);
-            LoadMatrix();
+            var lb = GetCurrentListBox();
+            if (lb?.SelectedItem is string title)
+            {
+                foreach (var t in TaskRepository.Tasks.Where(t => t.Title == title))
+                    t.IsUrgent = !t.IsUrgent;
+                TaskRepository.Save();
+                LoadMatrix();
+            }
         }
 
-        // Helper to find which ListBox currently has focus
         private ListBox GetCurrentListBox()
         {
-            return lbIU.Focused  ? lbIU
-                 : lbIN.Focused  ? lbIN
-                 : lbNU.Focused  ? lbNU
-                 : lbNN.Focused  ? lbNN
-                                 : null;
+            if (lbIU.Focused) return lbIU;
+            if (lbIN.Focused) return lbIN;
+            if (lbNU.Focused) return lbNU;
+            if (lbNN.Focused) return lbNN;
+            return null;
         }
     }
 }
+  
